@@ -760,6 +760,7 @@
 const SHEET_ID = '1yCEmCXPgPD0tTA6nA-EYgWRWz-cUvCq4aEm1WFFmsvE'; // 庫存試算表
 const API_KEY = 'AIzaSyCwJje5ims-fXMxQna0gAnG-hHmANFqF24'; // Google Sheets API Key
 const SHEET_NAME = '庫存';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLO3J5qaOYaPdM2OrxrLqbTWF25EXYZMJxJ8rpv-ozsOODQQynjGpNJoZBhijVQuMV/exec';
 
 // ── 資料 ──
 let inventoryData = [];
@@ -1081,9 +1082,8 @@ function closeReport() {
 
 function applyCount() {
   if (!confirm('確認更新庫存？此操作將以盤點數量覆蓋系統庫存。')) return;
-  saveToSheet(true);
   closeReport();
-  alert('✅ 庫存已更新！');
+  applyInventory();
 }
 
 function saveLocal() {
@@ -1091,23 +1091,65 @@ function saveLocal() {
   localStorage.setItem(`count_${dateKey}`, JSON.stringify(countData));
 }
 
-async function saveToSheet(apply = false) {
+async function saveToSheet() {
   setStatus('saving', '存檔中...');
   document.getElementById('btnSave').disabled = true;
-
   try {
-    // 儲存盤點紀錄到 Google Sheets
-    // 實際部署時需要後端 API 或 Apps Script
-    await new Promise(r => setTimeout(r, 800)); // 模擬延遲
+    const items = inventoryData.map(item => ({
+      code: item.code,
+      name: item.name,
+      systemQty: item.qty,
+      counted: countData[item.code] !== undefined ? countData[item.code] : null
+    })).filter(i => i.counted !== null);
+
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'save_count', session: currentSession, items })
+    });
+
     setStatus('ok', '已存檔');
     hasChanges = false;
-    alert('✅ 盤點紀錄已存檔！\n\n若要更新庫存，請點「確認並更新庫存」');
+    alert('✅ 盤點紀錄已存檔！\n\n若要更新庫存數量，請點「確認並更新庫存」');
   } catch(e) {
     setStatus('error', '存檔失敗');
     alert('存檔失敗，請檢查網路連線');
   }
-
   document.getElementById('btnSave').disabled = false;
+}
+
+async function applyInventory() {
+  setStatus('saving', '更新庫存中...');
+  try {
+    const items = inventoryData.map(item => ({
+      code: item.code,
+      name: item.name,
+      systemQty: item.qty,
+      counted: countData[item.code] !== undefined ? countData[item.code] : item.qty
+    }));
+
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'update_inventory', items })
+    });
+
+    items.forEach(item => {
+      const inv = inventoryData.find(i => i.code === item.code);
+      if (inv) inv.qty = item.counted;
+    });
+
+    countData = {};
+    hasChanges = false;
+    setStatus('ok', '庫存已更新');
+    renderItems();
+    alert('✅ 庫存已更新完成！');
+  } catch(e) {
+    setStatus('error', '更新失敗');
+    alert('更新失敗，請重試');
+  }
 }
 
 function newSession() {
