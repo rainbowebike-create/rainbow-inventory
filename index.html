@@ -1102,12 +1102,8 @@ async function saveToSheet() {
       counted: countData[item.code] !== undefined ? countData[item.code] : null
     })).filter(i => i.counted !== null);
 
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'save_count', session: currentSession, items })
-    });
+    const url = `${APPS_SCRIPT_URL}?action=save_count&session=${encodeURIComponent(currentSession)}&items=${encodeURIComponent(JSON.stringify(items))}`;
+    await fetch(url);
 
     setStatus('ok', '已存檔');
     hasChanges = false;
@@ -1129,12 +1125,8 @@ async function applyInventory() {
       counted: countData[item.code] !== undefined ? countData[item.code] : item.qty
     }));
 
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'update_inventory', items })
-    });
+    const url = `${APPS_SCRIPT_URL}?action=update_inventory&items=${encodeURIComponent(JSON.stringify(items))}`;
+    await fetch(url);
 
     items.forEach(item => {
       const inv = inventoryData.find(i => i.code === item.code);
