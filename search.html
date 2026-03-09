@@ -440,10 +440,10 @@ function renderRepairs(results, keyword) {
     const name   = get(1);
     const model  = get(2);
     const item   = get(3);
-    const phone  = get(4) || get(5) || '';
+    const phone  = get(4) || get(5) || get(6) || '';
+    const note   = get(7);
     const total  = get(10);
     const done   = get(11);
-    const note   = get(12);
 
     const isDone = done && done !== '未完成' && done !== '待處理';
     const statusText = isDone ? '已完成' : (done || '處理中');
