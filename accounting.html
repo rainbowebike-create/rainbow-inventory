@@ -6,11 +6,7 @@
 <title>彩虹電動車 記帳系統</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;
-    --orange:#ff6b35;--orange2:#ff8c5a;--text:#f0f0f0;--text2:#999;
-    --green:#4caf82;--red:#e05252;--blue:#5b8dee;
-  }
+  :root{--bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;--orange:#ff6b35;--orange2:#ff8c5a;--text:#f0f0f0;--text2:#999;--green:#4caf82;--red:#e05252;--blue:#5b8dee;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;min-height:100vh;}
   .header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
@@ -28,14 +24,13 @@
   .amount-wrap{position:relative;}
   .amount-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:14px;}
   .amount-input{padding-left:28px!important;font-family:'JetBrains Mono',monospace!important;font-size:16px!important;}
-  .category-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
   .cat-btn{padding:10px 8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:12px;font-weight:600;font-family:'Noto Sans TC',sans-serif;cursor:pointer;text-align:center;transition:all 0.2s;}
   .cat-btn.active{background:rgba(255,107,53,0.15);border-color:var(--orange);color:var(--orange);}
-  .phone-bar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px;}
-  .phone-bar-label{font-size:11px;color:var(--text2);font-weight:600;margin-bottom:6px;letter-spacing:0.5px;}
+  .section-bar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px;}
+  .section-bar-label{font-size:11px;color:var(--text2);font-weight:600;margin-bottom:8px;letter-spacing:0.5px;}
   .btn-add-item{width:100%;padding:12px;background:none;border:2px dashed var(--border);border-radius:12px;color:var(--text2);font-size:13px;font-weight:600;font-family:'Noto Sans TC',sans-serif;cursor:pointer;transition:all 0.2s;margin-bottom:12px;}
   .btn-add-item:hover{border-color:var(--orange);color:var(--orange);}
-  .pending-list{margin-bottom:16px;}
   .pending-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
   .pending-title{font-size:13px;font-weight:700;color:var(--text2);}
   .pending-total{font-size:16px;font-weight:900;color:var(--orange);font-family:'JetBrains Mono',monospace;}
@@ -46,7 +41,6 @@
   .pending-item-amount{font-size:14px;font-weight:700;color:var(--orange);font-family:'JetBrains Mono',monospace;}
   .btn-pending-remove{background:none;border:none;color:var(--text2);font-size:14px;cursor:pointer;margin-left:8px;}
   .btn-submit{width:100%;padding:14px;background:var(--orange);color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:'Noto Sans TC',sans-serif;cursor:pointer;transition:background 0.2s;margin-top:4px;}
-  .btn-submit:active{background:var(--orange2);}
   .btn-submit:disabled{background:var(--border);color:var(--text2);cursor:not-allowed;}
   .divider{height:1px;background:var(--border);margin:16px 0;}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--green);color:white;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;transition:opacity 0.3s;z-index:999;white-space:nowrap;}
@@ -91,27 +85,33 @@
 </div>
 
 <div id="tab-add" class="content">
-  <div class="phone-bar">
-    <div class="phone-bar-label">👤 登打人員</div>
-    <div class="category-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:12px">
-      <button class="cat-btn" onclick="selectOp(this,'Allison')" class="cat-btn op-btn">Allison</button>
-      <button class="cat-btn" onclick="selectOp(this,'珮君')" class="cat-btn op-btn">珮君</button>
-      <button class="cat-btn" onclick="selectOp(this,'智賢')" class="cat-btn op-btn">智賢</button>
+
+  <!-- 登打人員 -->
+  <div class="section-bar">
+    <div class="section-bar-label">👤 登打人員</div>
+    <div class="grid3">
+      <button class="cat-btn" id="op-Allison" onclick="selectOp('Allison')">Allison</button>
+      <button class="cat-btn" id="op-珮君" onclick="selectOp('珮君')">珮君</button>
+      <button class="cat-btn" id="op-智賢" onclick="selectOp('智賢')">智賢</button>
     </div>
-    <input type="hidden" id="operator">
-    <div class="phone-bar-label" style="margin-top:10px">📱 聯絡電話（同一客戶共用）</div>
-    <input type="tel" id="sharedPhone" class="form-input" placeholder="0933-xxx-xxx（選填）">
   </div>
 
+  <!-- 電話 -->
+  <div class="section-bar">
+    <div class="section-bar-label">📱 聯絡電話（同一客戶共用，選填）</div>
+    <input type="tel" id="sharedPhone" class="form-input" placeholder="0933-xxx-xxx">
+  </div>
+
+  <!-- 項目輸入 -->
   <div class="form-group">
     <label class="form-label">類別</label>
-    <div class="category-grid">
-      <button class="cat-btn" onclick="selectCat(this,'購車訂金')">購車訂金</button>
-      <button class="cat-btn" onclick="selectCat(this,'購車尾款')">購車尾款</button>
-      <button class="cat-btn" onclick="selectCat(this,'維修')">維修</button>
-      <button class="cat-btn" onclick="selectCat(this,'零件零售')">零件零售</button>
-      <button class="cat-btn" onclick="selectCat(this,'服務')">服務</button>
-      <button class="cat-btn" onclick="selectCat(this,'其他')">其他</button>
+    <div class="grid3">
+      <button class="cat-btn" id="cat-購車訂金" onclick="selectCat('購車訂金')">購車訂金</button>
+      <button class="cat-btn" id="cat-購車尾款" onclick="selectCat('購車尾款')">購車尾款</button>
+      <button class="cat-btn" id="cat-維修" onclick="selectCat('維修')">維修</button>
+      <button class="cat-btn" id="cat-零件零售" onclick="selectCat('零件零售')">零件零售</button>
+      <button class="cat-btn" id="cat-服務" onclick="selectCat('服務')">服務</button>
+      <button class="cat-btn" id="cat-其他" onclick="selectCat('其他')">其他</button>
     </div>
   </div>
   <div class="form-group">
@@ -133,13 +133,11 @@
   <button class="btn-add-item" onclick="addToList()">＋ 繼續新增下一筆</button>
 
   <div id="pendingSection" style="display:none">
-    <div class="pending-list">
-      <div class="pending-header">
-        <span class="pending-title">📋 待送出清單</span>
-        <span class="pending-total" id="pendingTotal">$0</span>
-      </div>
-      <div id="pendingItems"></div>
+    <div class="pending-header">
+      <span class="pending-title">📋 待送出清單</span>
+      <span class="pending-total" id="pendingTotal">$0</span>
     </div>
+    <div id="pendingItems"></div>
     <div class="divider"></div>
   </div>
 
@@ -161,20 +159,35 @@
 <script>
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLO3J5qaOYaPdM2OrxrLqbTWF25EXYZMJxJ8rpv-ozsOODQQynjGpNJoZBhijVQuMV/exec';
 let selectedCat = '';
-let selectedOp = localStorage.getItem('operator') || '';
+let selectedOp = localStorage.getItem('op') || '';
 let pendingList = [];
 
-function selectOp(btn, op) {
-  document.querySelectorAll('.op-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+// 初始化人員選擇
+window.onload = function() {
+  if (selectedOp) {
+    const btn = document.getElementById('op-' + selectedOp);
+    if (btn) btn.classList.add('active');
+  }
+};
+
+function selectOp(op) {
+  ['Allison','珮君','智賢'].forEach(n => {
+    const b = document.getElementById('op-' + n);
+    if (b) b.classList.remove('active');
+  });
+  const btn = document.getElementById('op-' + op);
+  if (btn) btn.classList.add('active');
   selectedOp = op;
-  document.getElementById('operator').value = op;
-  localStorage.setItem('operator', op);
+  localStorage.setItem('op', op);
 }
 
-function selectCat(btn, cat) {
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+function selectCat(cat) {
+  ['購車訂金','購車尾款','維修','零件零售','服務','其他'].forEach(c => {
+    const b = document.getElementById('cat-' + c);
+    if (b) b.classList.remove('active');
+  });
+  const btn = document.getElementById('cat-' + cat);
+  if (btn) btn.classList.add('active');
   selectedCat = cat;
 }
 
@@ -199,15 +212,16 @@ function addToList() {
   if(!selectedCat){showToast('請選擇類別',true);return;}
   if(!item){showToast('請填寫項目名稱',true);return;}
   if(!amount||isNaN(amount)||Number(amount)<=0){showToast('請填寫正確金額',true);return;}
-
   pendingList.push({cat:selectedCat, item, amount:Number(amount), note});
   renderPending();
-
   document.getElementById('item').value='';
   document.getElementById('amount').value='';
   document.getElementById('note').value='';
   selectedCat='';
-  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  ['購車訂金','購車尾款','維修','零件零售','服務','其他'].forEach(c=>{
+    const b=document.getElementById('cat-'+c);
+    if(b) b.classList.remove('active');
+  });
   showToast('已加入：'+item+' $'+Number(amount).toLocaleString());
 }
 
@@ -239,28 +253,20 @@ function removePending(i) {
 }
 
 async function submitAll() {
-  // 若目前有填寫中的項目，先加入
   const item = document.getElementById('item').value.trim();
   const amount = document.getElementById('amount').value.trim();
   const note = document.getElementById('note').value.trim();
 
-  if(item && amount && selectedCat) {
-    if(isNaN(amount)||Number(amount)<=0){showToast('請填寫正確金額',true);return;}
+  if(item && amount && selectedCat && Number(amount)>0) {
     pendingList.push({cat:selectedCat, item, amount:Number(amount), note});
-    renderPending();
     document.getElementById('item').value='';
     document.getElementById('amount').value='';
     document.getElementById('note').value='';
     selectedCat='';
-    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
   }
 
-  if(pendingList.length===0){
-    if(!selectedCat){showToast('請選擇類別',true);return;}
-    if(!item){showToast('請填寫項目名稱',true);return;}
-    showToast('請至少填寫一筆項目',true);
-    return;
-  }
+  if(pendingList.length===0){showToast('請至少填寫一筆項目',true);return;}
+  if(!selectedOp){showToast('請選擇登打人員',true);return;}
 
   const btn = document.getElementById('btnSubmit');
   btn.disabled=true;
@@ -271,7 +277,7 @@ async function submitAll() {
 
   try {
     for(const p of pendingList) {
-      const url = `${APPS_SCRIPT_URL}?action=notion_add&date=${encodeURIComponent(today)}&item=${encodeURIComponent(p.item)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(p.cat)}&amount=${encodeURIComponent(p.amount)}&note=${encodeURIComponent(p.note)}`note=${encodeURIComponent(p.note)}&operator=${encodeURIComponent(selectedOp)}`;
+      const url = `${APPS_SCRIPT_URL}?action=notion_add&date=${encodeURIComponent(today)}&item=${encodeURIComponent(p.item)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(p.cat)}&amount=${encodeURIComponent(p.amount)}&note=${encodeURIComponent(p.note)}&operator=${encodeURIComponent(selectedOp)}`;
       await fetch(url);
     }
     const total = pendingList.reduce((s,p)=>s+p.amount,0);
@@ -316,16 +322,18 @@ function renderRecords(results,period) {
     const cat=props['類別']?.multi_select?.[0]?.name||'';
     const amt=props['金額']?.number||0;
     const note=props['備註']?.rich_text?.[0]?.text?.content||'';
+    const op=props['登打人員']?.multi_select?.[0]?.name||'';
     total+=amt;
     catTotals[cat]=(catTotals[cat]||0)+amt;
     html+=`<div class="record-card">
       <div class="record-header">
-        <div class="record-item">${item}${phone?` <span style="color:var(--text2);font-size:12px">${phone}</span>`:''}</div>
+        <div class="record-item">${item}${phone?' <span style="color:var(--text2);font-size:12px">'+phone+'</span>':''}</div>
         <div class="record-amount">$${amt.toLocaleString()}</div>
       </div>
       <div class="record-meta">
         <span class="record-tag tag-${cat}">${cat}</span>
         ${period==='month'?`<span>${date}</span>`:''}
+        ${op?`<span>👤 ${op}</span>`:''}
         ${note?`<span>📝 ${note}</span>`:''}
       </div>
     </div>`;
