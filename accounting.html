@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>彩虹電動車 記帳系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --orange: #ff6b35;
+    --orange2: #ff8c5a;
+    --text: #f0f0f0;
+    --text2: #999;
+    --green: #4caf82;
+    --red: #e05252;
+    --blue: #5b8dee;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; min-height: 100vh; }
+
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 12px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-icon { width: 36px; height: 36px; background: var(--orange); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .header-title { font-size: 16px; font-weight: 700; }
+  .header-sub { font-size: 10px; color: var(--text2); letter-spacing: 2px; text-transform: uppercase; }
+
+  .tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; gap: 4px; }
+  .tab { padding: 12px 20px; font-size: 13px; font-weight: 600; color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+  .content { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+  /* Form */
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; display: block; font-weight: 600; letter-spacing: 0.5px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Noto Sans TC', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--orange); }
+  .form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  .form-select option { background: var(--surface2); }
+
+  .amount-wrap { position: relative; }
+  .amount-prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 14px; }
+  .amount-input { padding-left: 28px !important; font-family: 'JetBrains Mono', monospace !important; font-size: 16px !important; }
+
+  .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .cat-btn {
+    padding: 10px 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .cat-btn.active { background: rgba(255,107,53,0.15); border-color: var(--orange); color: var(--orange); }
+
+  .btn-submit {
+    width: 100%; padding: 14px;
+    background: var(--orange); color: white;
+    border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 700;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer; transition: background 0.2s;
+    margin-top: 8px;
+  }
+  .btn-submit:active { background: var(--orange2); }
+  .btn-submit:disabled { background: var(--border); color: var(--text2); cursor: not-allowed; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--green); color: white;
+    padding: 12px 24px; border-radius: 12px;
+    font-size: 14px; font-weight: 600;
+    opacity: 0; transition: opacity 0.3s;
+    z-index: 999; white-space: nowrap;
+  }
+  .toast.error { background: var(--red); }
+  .toast.show { opacity: 1; }
+
+  /* Records */
+  .record-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+  .record-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .record-item { font-size: 14px; font-weight: 700; }
+  .record-amount { font-size: 16px; font-weight: 700; color: var(--orange); font-family: 'JetBrains Mono', monospace; }
+  .record-meta { font-size: 12px; color: var(--text2); display: flex; gap: 10px; flex-wrap: wrap; }
+  .record-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+  .tag-購車訂金 { background: rgba(255,107,53,0.15); color: var(--orange); }
+  .tag-購車尾款 { background: rgba(255,140,90,0.15); color: var(--orange2); }
+  .tag-維修 { background: rgba(91,141,238,0.15); color: var(--blue); }
+  .tag-零件零售 { background: rgba(76,175,130,0.15); color: var(--green); }
+  .tag-服務 { background: rgba(153,153,153,0.15); color: var(--text2); }
+  .tag-其他 { background: rgba(153,153,153,0.15); color: var(--text2); }
+
+  .summary-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .summary-label { font-size: 12px; color: var(--text2); }
+  .summary-total { font-size: 20px; font-weight: 900; color: var(--orange); font-family: 'JetBrains Mono', monospace; }
+
+  .loading { text-align: center; padding: 40px; color: var(--text2); font-size: 13px; }
+  .spinner { width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .date-filter { display: flex; gap: 8px; margin-bottom: 16px; }
+  .date-btn { flex: 1; padding: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text2); font-size: 12px; font-weight: 600; font-family: 'Noto Sans TC', sans-serif; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .date-btn.active { background: rgba(255,107,53,0.15); border-color: var(--orange); color: var(--orange); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">💰</div>
+  <div>
+    <div class="header-title">彩虹電動車</div>
+    <div class="header-sub">Accounting System</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('add')">➕ 新增記帳</div>
+  <div class="tab" onclick="switchTab('list')">📋 今日明細</div>
+</div>
+
+<!-- 新增記帳 -->
+<div id="tab-add" class="content">
+  <div class="form-group">
+    <label class="form-label">類別</label>
+    <div class="category-grid">
+      <button class="cat-btn" onclick="selectCat(this,'購車訂金')">購車訂金</button>
+      <button class="cat-btn" onclick="selectCat(this,'購車尾款')">購車尾款</button>
+      <button class="cat-btn" onclick="selectCat(this,'維修')">維修</button>
+      <button class="cat-btn" onclick="selectCat(this,'零件零售')">零件零售</button>
+      <button class="cat-btn" onclick="selectCat(this,'服務')">服務</button>
+      <button class="cat-btn" onclick="selectCat(this,'其他')">其他</button>
+    </div>
+    <input type="hidden" id="category">
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">車型 / 項目名稱</label>
+    <input type="text" id="item" class="form-input" placeholder="例如：A11黑色、更換碟盤、FK001平叉">
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">聯絡電話（選填）</label>
+    <input type="tel" id="phone" class="form-input" placeholder="0933-xxx-xxx">
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">金額</label>
+    <div class="amount-wrap">
+      <span class="amount-prefix">$</span>
+      <input type="number" id="amount" class="form-input amount-input" placeholder="0" inputmode="numeric">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">備註（選填）</label>
+    <input type="text" id="note" class="form-input" placeholder="例如：等電池、轉帳、分期">
+  </div>
+
+  <button class="btn-submit" id="btnSubmit" onclick="submitRecord()">✅ 確認記帳</button>
+</div>
+
+<!-- 今日明細 -->
+<div id="tab-list" class="content" style="display:none">
+  <div class="date-filter">
+    <button class="date-btn active" id="btn-today" onclick="loadRecords('today')">今日</button>
+    <button class="date-btn" id="btn-month" onclick="loadRecords('month')">本月</button>
+  </div>
+  <div id="records-content">
+    <div class="loading"><div class="spinner"></div>載入中...</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const NOTION_TOKEN = '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';
+const NOTION_DB_ID = '31f9ac3db3398023943af31fab253a53';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLO3J5qaOYaPdM2OrxrLqbTWF25EXYZMJxJ8rpv-ozsOODQQynjGpNJoZBhijVQuMV/exec';
+
+let selectedCat = '';
+
+function selectCat(btn, cat) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedCat = cat;
+  document.getElementById('category').value = cat;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='add')||(i===1&&tab==='list')));
+  document.getElementById('tab-add').style.display = tab === 'add' ? 'block' : 'none';
+  document.getElementById('tab-list').style.display = tab === 'list' ? 'block' : 'none';
+  if (tab === 'list') loadRecords('today');
+}
+
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '') + ' show';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function submitRecord() {
+  const item = document.getElementById('item').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const amount = document.getElementById('amount').value.trim();
+  const note = document.getElementById('note').value.trim();
+
+  if (!selectedCat) { showToast('請選擇類別', true); return; }
+  if (!item) { showToast('請填寫項目名稱', true); return; }
+  if (!amount || isNaN(amount)) { showToast('請填寫正確金額', true); return; }
+
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = '送出中...';
+
+  const today = new Date().toISOString().split('T')[0];
+
+  // 透過 Apps Script 代理寫入 Notion（避免 CORS）
+  const url = `${APPS_SCRIPT_URL}?action=notion_add&date=${encodeURIComponent(today)}&item=${encodeURIComponent(item)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(selectedCat)}&amount=${encodeURIComponent(amount)}&note=${encodeURIComponent(note)}`;
+
+  try {
+    await fetch(url);
+    showToast(`✅ 記帳成功！${item} $${Number(amount).toLocaleString()}`);
+    // 清空表單
+    document.getElementById('item').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('amount').value = '';
+    document.getElementById('note').value = '';
+    selectedCat = '';
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  } catch(e) {
+    showToast('記帳失敗，請重試', true);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✅ 確認記帳';
+}
+
+async function loadRecords(period) {
+  document.getElementById('btn-today').classList.toggle('active', period==='today');
+  document.getElementById('btn-month').classList.toggle('active', period==='month');
+
+  document.getElementById('records-content').innerHTML = '<div class="loading"><div class="spinner"></div>載入中...</div>';
+
+  const today = new Date().toISOString().split('T')[0];
+  const firstDay = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+  const start = period === 'today' ? today : firstDay;
+
+  const url = `${APPS_SCRIPT_URL}?action=notion_query&start=${start}&end=${today}`;
+
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { data = { results: [] }; }
+
+    renderRecords(data.results || [], period);
+  } catch(e) {
+    document.getElementById('records-content').innerHTML = '<div class="loading">載入失敗，請重試</div>';
+  }
+}
+
+function renderRecords(results, period) {
+  if (!results.length) {
+    document.getElementById('records-content').innerHTML = '<div class="loading">尚無記錄</div>';
+    return;
+  }
+
+  let total = 0;
+  const catTotals = {};
+  let html = '';
+
+  results.reverse().forEach(r => {
+    const props = r.properties || {};
+    const date = props['日期']?.date?.start || '';
+    const item = props['項目名稱']?.title?.[0]?.text?.content || '';
+    const phone = props['連絡電話']?.rich_text?.[0]?.text?.content || '';
+    const cats = props['類別']?.multi_select?.map(c => c.name) || [];
+    const cat = cats[0] || '';
+    const amt = props['金額']?.number || 0;
+    const note = props['備註']?.rich_text?.[0]?.text?.content || '';
+
+    total += amt;
+    catTotals[cat] = (catTotals[cat] || 0) + amt;
+
+    html += `
+    <div class="record-card">
+      <div class="record-header">
+        <div class="record-item">${item}${phone ? ` <span style="color:var(--text2);font-size:12px">${phone}</span>` : ''}</div>
+        <div class="record-amount">$${amt.toLocaleString()}</div>
+      </div>
+      <div class="record-meta">
+        <span class="record-tag tag-${cat}">${cat}</span>
+        ${period==='month' ? `<span>${date}</span>` : ''}
+        ${note ? `<span>📝 ${note}</span>` : ''}
+      </div>
+    </div>`;
+  });
+
+  // 彙總
+  const title = period === 'today' ? '今日收款' : '本月收款';
+  let summaryHtml = `<div class="summary-bar"><div><div class="summary-label">${title}</div><div style="font-size:11px;color:var(--text2);margin-top:2px">`;
+  summaryHtml += Object.entries(catTotals).map(([c,a]) => `${c} $${a.toLocaleString()}`).join('　');
+  summaryHtml += `</div></div><div class="summary-total">$${total.toLocaleString()}</div></div>`;
+
+  document.getElementById('records-content').innerHTML = summaryHtml + html;
+}
+</script>
+</body>
+</html>
