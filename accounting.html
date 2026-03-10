@@ -92,7 +92,14 @@
 
 <div id="tab-add" class="content">
   <div class="phone-bar">
-    <div class="phone-bar-label">📱 聯絡電話（同一客戶共用）</div>
+    <div class="phone-bar-label">👤 登打人員</div>
+    <div class="category-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:12px">
+      <button class="cat-btn" onclick="selectOp(this,'Allison')" class="cat-btn op-btn">Allison</button>
+      <button class="cat-btn" onclick="selectOp(this,'珮君')" class="cat-btn op-btn">珮君</button>
+      <button class="cat-btn" onclick="selectOp(this,'智賢')" class="cat-btn op-btn">智賢</button>
+    </div>
+    <input type="hidden" id="operator">
+    <div class="phone-bar-label" style="margin-top:10px">📱 聯絡電話（同一客戶共用）</div>
     <input type="tel" id="sharedPhone" class="form-input" placeholder="0933-xxx-xxx（選填）">
   </div>
 
@@ -154,7 +161,16 @@
 <script>
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLO3J5qaOYaPdM2OrxrLqbTWF25EXYZMJxJ8rpv-ozsOODQQynjGpNJoZBhijVQuMV/exec';
 let selectedCat = '';
+let selectedOp = localStorage.getItem('operator') || '';
 let pendingList = [];
+
+function selectOp(btn, op) {
+  document.querySelectorAll('.op-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedOp = op;
+  document.getElementById('operator').value = op;
+  localStorage.setItem('operator', op);
+}
 
 function selectCat(btn, cat) {
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -255,7 +271,7 @@ async function submitAll() {
 
   try {
     for(const p of pendingList) {
-      const url = `${APPS_SCRIPT_URL}?action=notion_add&date=${encodeURIComponent(today)}&item=${encodeURIComponent(p.item)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(p.cat)}&amount=${encodeURIComponent(p.amount)}&note=${encodeURIComponent(p.note)}`;
+      const url = `${APPS_SCRIPT_URL}?action=notion_add&date=${encodeURIComponent(today)}&item=${encodeURIComponent(p.item)}&phone=${encodeURIComponent(phone)}&category=${encodeURIComponent(p.cat)}&amount=${encodeURIComponent(p.amount)}&note=${encodeURIComponent(p.note)}`note=${encodeURIComponent(p.note)}&operator=${encodeURIComponent(selectedOp)}`;
       await fetch(url);
     }
     const total = pendingList.reduce((s,p)=>s+p.amount,0);
