@@ -295,6 +295,101 @@ body {
 .boss-mode-btn { font-size: 13px; }
 .boss-mode-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
+
+/* 品項選擇抽屜 */
+.drawer-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+.drawer-overlay.open { opacity: 1; pointer-events: all; }
+.drawer {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 2px solid var(--accent);
+  border-radius: 16px 16px 0 0;
+  z-index: 201;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+  max-height: 80vh;
+  display: flex; flex-direction: column;
+}
+.drawer.open { transform: translateY(0); }
+.drawer-handle {
+  width: 40px; height: 4px; background: var(--border);
+  border-radius: 2px; margin: 10px auto 0;
+  flex-shrink: 0;
+}
+.drawer-header {
+  padding: 10px 16px 0;
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.drawer-title { font-weight: 900; font-size: 15px; flex: 1; }
+.drawer-close {
+  background: none; border: none; color: var(--muted);
+  font-size: 20px; cursor: pointer; padding: 4px 8px;
+  border-radius: 6px; line-height: 1;
+}
+.drawer-close:hover { color: var(--text); background: var(--card); }
+.drawer-search {
+  margin: 10px 16px 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'Noto Sans TC', sans-serif;
+  outline: none;
+  flex-shrink: 0;
+}
+.drawer-search:focus { border-color: var(--accent); }
+.drawer-tabs {
+  display: flex; gap: 4px;
+  padding: 10px 16px 0;
+  overflow-x: auto; flex-shrink: 0;
+}
+.drawer-tab {
+  padding: 7px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+  color: var(--muted);
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.15s;
+}
+.drawer-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+.drawer-list {
+  flex: 1; overflow-y: auto;
+  padding: 10px 16px 24px;
+}
+.drawer-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.drawer-item:active { background: var(--border); border-color: var(--accent); }
+.drawer-item-left { flex: 1; }
+.drawer-item-name { font-size: 15px; font-weight: 500; }
+.drawer-item-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.drawer-item-price {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 15px; font-weight: 700;
+  color: var(--accent); text-align: right;
+}
+.drawer-item-price-label { font-size: 10px; color: var(--muted); text-align: right; }
+.drawer-empty { text-align: center; padding: 30px; color: var(--muted); font-size: 13px; }
+
 /* Tooltip */
 .tip { font-size: 11px; color: var(--muted); margin-top: 5px; }
 
@@ -445,13 +540,9 @@ body {
     </div>
 
     <div class="add-row-area">
-      <div class="search-wrap">
-        <input class="search-box" type="text" id="searchInput" placeholder="🔍 搜尋零件 / 配件名稱，或輸入新品項..." oninput="searchItems()" onkeydown="searchKeydown(event)">
-        <div class="search-results" id="searchResults" style="display:none"></div>
-      </div>
-      <button class="btn btn-accent btn-sm" onclick="addManualRow()">＋ 手動新增</button>
+      <button class="btn btn-accent" onclick="openDrawer()" style="flex:1;justify-content:center;font-size:15px;padding:12px">＋ 加入品項</button>
+      <button class="btn btn-ghost btn-sm" onclick="addManualRow()">手動新增</button>
     </div>
-    <div style="padding:0 16px 12px;"><div class="tip">💡 輸入品項名稱搜尋零件資料庫，選取後自動帶入價格；或點「手動新增」自行填寫</div></div>
   </div>
 
   <!-- 備註 & 收款 -->
@@ -508,6 +599,26 @@ body {
   </div>
 </div>
 
+
+<!-- 品項抽屜 -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <div class="drawer-title">選擇品項</div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <input class="drawer-search" type="text" id="drawerSearch" placeholder="🔍 搜尋名稱..." oninput="renderDrawer()">
+  <div class="drawer-tabs" id="drawerTabs">
+    <div class="drawer-tab active" onclick="setDrawerTab('all')" id="dtab-all">全部</div>
+    <div class="drawer-tab" onclick="setDrawerTab('battery')" id="dtab-battery">🔋 電池</div>
+    <div class="drawer-tab" onclick="setDrawerTab('accessory')" id="dtab-accessory">🔩 配件</div>
+    <div class="drawer-tab" onclick="setDrawerTab('charger')" id="dtab-charger">🔌 充電器</div>
+    <div class="drawer-tab" onclick="setDrawerTab('controller')" id="dtab-controller">⚙️ 控制器</div>
+  </div>
+  <div class="drawer-list" id="drawerList"></div>
+</div>
+
 <!-- Print layout -->
 <div class="quote-print" id="printArea"></div>
 
@@ -532,9 +643,7 @@ function toggleBossMode() {
 }
 
 // ── 初始化 ──
-window.addEventListener('click', e => {
-  if (!e.target.closest('.search-wrap')) closeSearch();
-});
+// search replaced with code input
 
 document.addEventListener('DOMContentLoaded', async () => {
   // set today
@@ -572,63 +681,87 @@ function setType(type) {
   if (hdr) hdr.textContent = type === 'parts' ? '零售價' : '完工價';
 }
 
-// ── 搜尋零件 ──
-function buildSearchPool() {
+// ── 品項抽屜 ──
+let drawerTab = 'all';
+
+function buildItemPool() {
   const isParts = orderType === 'parts';
   const pool = [];
-  // 配件：零售價 = price，維修完工價 = price（相同）
-  (priceData.accessories || []).forEach(a => pool.push({ name: a.name, type: '配件', cost: a.cost || 0, price: a.price || 0 }));
-  // 電池：零售價 = retailPrice，維修隨車價 = withCarPrice
-  (priceData.batteries || []).forEach(b => pool.push({ name: b.name, type: '電池', cost: b.cost || 0, price: isParts ? (b.retailPrice || 0) : (b.withCarPrice || 0) }));
-  (priceData.chargers || []).forEach(c => pool.push({ name: c.name, type: '充電器', cost: c.cost || 0, price: c.price || 0 }));
-  (priceData.controllers || []).forEach(c => pool.push({ name: c.name, type: '控制器', cost: c.cost || 0, price: c.price || 0 }));
+  (priceData.batteries || []).forEach(b => pool.push({
+    code: String(b.code), name: b.name, category: 'battery', type: '電池',
+    cost: b.cost || 0,
+    price: isParts ? (b.retailPrice || 0) : (b.withCarPrice || 0),
+    priceLabel: isParts ? '零售價' : '隨車價'
+  }));
+  (priceData.accessories || []).forEach(a => pool.push({
+    code: String(a.code), name: a.name, category: 'accessory', type: '配件',
+    cost: a.cost || 0, price: a.price || 0, priceLabel: isParts ? '零售價' : '完工價'
+  }));
+  (priceData.chargers || []).forEach(c => pool.push({
+    code: String(c.code), name: c.name, category: 'charger', type: '充電器',
+    cost: c.cost || 0, price: c.price || 0, priceLabel: isParts ? '零售價' : '完工價'
+  }));
+  (priceData.controllers || []).forEach(c => pool.push({
+    code: String(c.code), name: c.name, category: 'controller', type: '控制器',
+    cost: c.cost || 0, price: c.price || 0, priceLabel: isParts ? '零售價' : '完工價'
+  }));
   return pool;
 }
 
-function searchItems() {
-  const q = document.getElementById('searchInput').value.trim();
-  const resultsDiv = document.getElementById('searchResults');
-  if (!q) { resultsDiv.style.display = 'none'; return; }
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('drawerSearch').value = '';
+  drawerTab = 'all';
+  document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('dtab-all').classList.add('active');
+  renderDrawer();
+  setTimeout(() => document.getElementById('drawerSearch').focus(), 300);
+}
 
-  const pool = buildSearchPool();
-  const filtered = pool.filter(p => p.name.includes(q)).slice(0, 12);
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
 
-  if (filtered.length === 0) {
-    resultsDiv.style.display = 'none';
+function setDrawerTab(tab) {
+  drawerTab = tab;
+  document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('dtab-' + tab).classList.add('active');
+  renderDrawer();
+}
+
+function renderDrawer() {
+  const q = document.getElementById('drawerSearch').value.trim();
+  let pool = buildItemPool();
+  if (drawerTab !== 'all') pool = pool.filter(p => p.category === drawerTab);
+  if (q) pool = pool.filter(p => p.name.includes(q) || p.code.includes(q));
+
+  if (pool.length === 0) {
+    document.getElementById('drawerList').innerHTML = '<div class="drawer-empty">找不到符合品項</div>';
     return;
   }
 
-  resultsDiv.innerHTML = filtered.map((p, i) => `
-    <div class="search-result-item" onclick="selectItem(${i})" data-idx="${i}">
-      <div>
-        <div class="sri-name">${p.name}</div>
-        <div class="sri-type">${p.type}</div>
+  document.getElementById('drawerList').innerHTML = pool.map((item, i) => `
+    <div class="drawer-item" onclick="selectDrawerItem(${i})" data-pool-idx="${i}">
+      <div class="drawer-item-left">
+        <div class="drawer-item-name">${item.name}</div>
+        <div class="drawer-item-sub">${item.type}・編號 ${item.code}</div>
       </div>
-      <div class="sri-price">${orderType === 'parts' ? '零售' : '完工'} $${Number(p.price).toLocaleString()}</div>
+      <div>
+        <div class="drawer-item-price">$${item.price.toLocaleString()}</div>
+        <div class="drawer-item-price-label">${item.priceLabel}</div>
+      </div>
     </div>
   `).join('');
-  resultsDiv.style.display = 'block';
-  resultsDiv._data = filtered;
+  document.getElementById('drawerList')._pool = pool;
 }
 
-function searchKeydown(e) {
-  if (e.key === 'Enter') {
-    const q = document.getElementById('searchInput').value.trim();
-    if (q) { addManualRow(q); closeSearch(); }
-  }
-  if (e.key === 'Escape') closeSearch();
-}
-
-function selectItem(idx) {
-  const pool = document.getElementById('searchResults')._data;
+function selectDrawerItem(idx) {
+  const pool = document.getElementById('drawerList')._pool;
   const item = pool[idx];
   addItemRow(item.name, item.type, 1, item.cost, item.price);
-  document.getElementById('searchInput').value = '';
-  closeSearch();
-}
-
-function closeSearch() {
-  document.getElementById('searchResults').style.display = 'none';
+  closeDrawer();
 }
 
 // ── 新增品項列 ──
