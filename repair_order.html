@@ -652,7 +652,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('orderDate').value = today;
 
   await loadPriceData();
-  addManualRow(); // 預設一行
+  // 不預設空白行
 });
 
 async function loadPriceData() {
@@ -872,9 +872,9 @@ async function generateOrder() {
     staffWork:  document.getElementById('staffWork').value,
     deposit:    parseInt(document.getElementById('deposit').value) || 0,
     notes:      document.getElementById('notes').value,
-    items: items.map(i => ({
+    items: items.filter(i => i.name && i.name.trim()).map(i => ({
       code:  i.code || '',
-      name:  i.name,
+      name:  i.name.trim(),
       type:  i.type,
       qty:   i.qty,
       cost:  i.cost,
