@@ -440,6 +440,7 @@ body {
   </div>
   <div class="header-right">
     <button class="btn btn-ghost btn-sm boss-mode-btn" id="bossModeBtn" onclick="toggleBossMode()">🔒 老闆</button>
+    <a href="repair_history.html" class="btn btn-ghost btn-sm">📋 紀錄</a>
     <button class="btn btn-outline btn-sm" onclick="clearAll()">🗑 清除</button>
     <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 列印</button>
   </div>
@@ -849,14 +850,66 @@ function calcSummary() {
   document.getElementById('balance').value = '$' + Math.max(0, balance).toLocaleString();
 }
 
-// ── 產生訂單（列印版） ──
-function generateOrder() {
+// ── 產生訂單 ──
+async function generateOrder() {
   if (items.length === 0) { showToast('請先新增品項', 'error'); return; }
-  buildPrintArea();
-  showToast('訂單已產生，可按「列印」輸出', 'success');
+  if (!document.getElementById('cusName').value) { showToast('請填寫客戶姓名', 'error'); return; }
+
+  // 組裝資料
+  const payload = {
+    action: 'createRepairOrder',
+    orderType,
+    orderDate:  document.getElementById('orderDate').value,
+    doneDate:   document.getElementById('doneDate').value,
+    cusName:    document.getElementById('cusName').value,
+    cusPhone:   document.getElementById('cusPhone').value,
+    cusName2:   document.getElementById('cusName2').value,
+    cusPhone2:  document.getElementById('cusPhone2').value,
+    cusAddr:    document.getElementById('cusAddr').value,
+    frameNo:    document.getElementById('frameNo').value,
+    plateNo:    document.getElementById('plateNo').value,
+    staffIn:    document.getElementById('staffIn').value,
+    staffWork:  document.getElementById('staffWork').value,
+    deposit:    parseInt(document.getElementById('deposit').value) || 0,
+    notes:      document.getElementById('notes').value,
+    items: items.map(i => ({
+      code:  i.code || '',
+      name:  i.name,
+      type:  i.type,
+      qty:   i.qty,
+      cost:  i.cost,
+      price: i.price
+    }))
+  };
+
+  // 顯示 loading
+  const btn = document.querySelector('.summary-actions .btn-accent');
+  const original = btn.innerHTML;
+  btn.innerHTML = '⏳ 儲存中...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      buildPrintArea(result.orderId);
+      showToast(`✅ 訂單 ${result.orderId} 已儲存！`, 'success');
+    } else {
+      showToast('❌ 儲存失敗：' + (result.message || ''), 'error');
+    }
+  } catch(e) {
+    showToast('❌ 網路錯誤，請重試', 'error');
+  }
+
+  btn.innerHTML = original;
+  btn.disabled = false;
 }
 
-function buildPrintArea() {
+function buildPrintArea(orderId = '') {
   const totalCost = items.reduce((s, i) => s + Math.round(i.qty * i.cost), 0);
   const totalPrice = items.reduce((s, i) => s + Math.round(i.qty * i.price), 0);
   const deposit = parseInt(document.getElementById('deposit').value) || 0;
@@ -876,6 +929,7 @@ function buildPrintArea() {
 
   document.getElementById('printArea').innerHTML = `
     <div class="print-title">🌈 彩虹電動車 ${typeName}</div>
+    ${orderId ? `<div style="text-align:center;font-size:12px;color:#666;margin-bottom:8px">訂單編號：${orderId}</div>` : ''}
     <div class="print-info">
       <div><span>接單日期：</span>${document.getElementById('orderDate').value}</div>
       <div><span>完成日期：</span>${document.getElementById('doneDate').value}</div>

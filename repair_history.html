@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>彩虹電動車 維修紀錄查詢</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14; --surface: #161a24; --card: #1e2433; --border: #2a3044;
+  --accent: #e8c547; --green: #4ade80; --red: #f87171; --text: #e8eaf0; --muted: #6b7591;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; min-height: 100vh; }
+
+.header {
+  background: var(--surface); border-bottom: 2px solid var(--accent);
+  padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 50;
+}
+.logo { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; color: #000; flex-shrink: 0; }
+.header-title { font-weight: 900; font-size: 16px; }
+.header-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.back-btn {
+  margin-left: auto; background: transparent; border: 1px solid var(--border);
+  color: var(--muted); border-radius: 7px; padding: 6px 12px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  font-family: 'Noto Sans TC', sans-serif; text-decoration: none;
+}
+.back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.filter-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.filter-row { display: flex; gap: 8px; }
+.filter-input {
+  flex: 1; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px; color: var(--text);
+  font-size: 14px; font-family: 'Noto Sans TC', sans-serif; outline: none;
+}
+.filter-input:focus { border-color: var(--accent); }
+.filter-btn {
+  background: var(--accent); border: none; border-radius: 8px;
+  padding: 10px 16px; font-size: 13px; font-weight: 700;
+  font-family: 'Noto Sans TC', sans-serif; cursor: pointer; color: #000;
+  white-space: nowrap;
+}
+.filter-btn:hover { background: #f0d060; }
+
+.type-tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 12px; }
+.type-tab { padding: 9px 16px; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; }
+.type-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.main { padding: 12px 16px; max-width: 680px; margin: 0 auto; }
+
+.summary-strip {
+  display: flex; gap: 12px; margin-bottom: 14px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 16px;
+}
+.strip-item { text-align: center; flex: 1; }
+.strip-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; font-weight: 700; }
+.strip-val { font-size: 16px; font-family: 'Share Tech Mono', monospace; font-weight: 700; margin-top: 2px; }
+.strip-val.accent { color: var(--accent); }
+.strip-val.green { color: var(--green); }
+
+.order-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; margin-bottom: 10px; overflow: hidden;
+}
+.order-head {
+  padding: 12px 14px; display: flex; align-items: center; gap: 10px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.order-id { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--accent); }
+.order-name { font-size: 15px; font-weight: 700; }
+.order-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.order-right { margin-left: auto; text-align: right; flex-shrink: 0; }
+.order-total { font-family: 'Share Tech Mono', monospace; font-size: 16px; font-weight: 700; color: var(--accent); }
+.order-profit { font-size: 11px; margin-top: 2px; }
+.order-type-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 7px;
+  border-radius: 4px; background: rgba(232,197,71,0.15);
+  color: var(--accent); border: 1px solid rgba(232,197,71,0.3);
+  white-space: nowrap;
+}
+.chevron { color: var(--muted); font-size: 14px; transition: transform 0.2s; flex-shrink: 0; }
+.chevron.open { transform: rotate(90deg); }
+
+.order-detail {
+  display: none; border-top: 1px solid var(--border);
+  padding: 12px 14px;
+}
+.order-detail.open { display: block; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+.detail-item { font-size: 12px; }
+.detail-label { color: var(--muted); font-size: 11px; }
+
+.items-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+.items-table th { background: var(--surface); padding: 6px 8px; text-align: left; color: var(--muted); font-size: 10px; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
+.items-table th.r { text-align: right; }
+.items-table td { padding: 6px 8px; border-bottom: 1px solid #1a1f2e; }
+.items-table td.r { text-align: right; font-family: 'Share Tech Mono', monospace; }
+.items-table tr:last-child td { border-bottom: none; }
+.profit-pos { color: var(--green); }
+.profit-neg { color: var(--red); }
+
+.empty { text-align: center; padding: 50px 16px; color: var(--muted); font-size: 14px; }
+.loading { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+.spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.boss-btn { font-size: 12px; padding: 6px 10px; background: transparent; border: 1px solid var(--border); border-radius: 7px; color: var(--muted); cursor: pointer; font-family: 'Noto Sans TC', sans-serif; }
+.boss-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+.boss-only { display: none; }
+.boss-mode .boss-only { display: table-cell; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">🌈</div>
+  <div>
+    <div class="header-title">維修/銷售 紀錄</div>
+    <div class="header-sub">查詢歷史訂單</div>
+  </div>
+  <button class="boss-btn" id="bossBtn" onclick="toggleBoss()">🔒 老闆</button>
+  <a class="back-btn" href="repair_order.html" style="margin-left:8px">← 開單</a>
+</div>
+
+<div class="filter-bar">
+  <div class="filter-row">
+    <input class="filter-input" type="text" id="searchQ" placeholder="🔍 搜尋客戶姓名、電話、車牌、訂單編號">
+    <button class="filter-btn" onclick="loadOrders()">查詢</button>
+  </div>
+  <div class="filter-row">
+    <input class="filter-input" type="date" id="dateFrom" style="flex:none;width:140px">
+    <span style="align-self:center;color:var(--muted);font-size:12px">至</span>
+    <input class="filter-input" type="date" id="dateTo" style="flex:none;width:140px">
+    <button class="filter-btn" style="background:var(--surface);color:var(--text);border:1px solid var(--border)" onclick="clearDate()">清除</button>
+  </div>
+</div>
+
+<div class="type-tabs">
+  <div class="type-tab active" onclick="setType('all')" id="ttab-all">全部</div>
+  <div class="type-tab" onclick="setType('repair')" id="ttab-repair">🔧 維修/改裝</div>
+  <div class="type-tab" onclick="setType('parts')" id="ttab-parts">📦 零件銷售</div>
+</div>
+
+<div class="main">
+  <div id="summaryStrip" style="display:none" class="summary-strip">
+    <div class="strip-item"><div class="strip-label">筆數</div><div class="strip-val accent" id="sCount">0</div></div>
+    <div class="strip-item"><div class="strip-label">總營收</div><div class="strip-val accent" id="sRevenue">$0</div></div>
+    <div class="strip-item boss-only" style="display:none" id="sCostWrap"><div class="strip-label">成本</div><div class="strip-val" id="sCost">$0</div></div>
+    <div class="strip-item boss-only" style="display:none" id="sProfitWrap"><div class="strip-label">毛利</div><div class="strip-val green" id="sProfit">$0</div></div>
+  </div>
+  <div id="orderList"><div class="loading"><div class="spinner"></div>載入中...</div></div>
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxJ9Vj0bbsemvgLwED1ivTMcuZ3mut_s9dXKDmnQd_2htCocCEXHQPefv5xitaiQy8a3g/exec';
+
+let currentType = 'all';
+let allOrders = [];
+let bossMode = false;
+
+function toggleBoss() {
+  bossMode = !bossMode;
+  document.body.classList.toggle('boss-mode', bossMode);
+  const btn = document.getElementById('bossBtn');
+  btn.textContent = bossMode ? '🔓 老闆' : '🔒 老闆';
+  btn.classList.toggle('active', bossMode);
+  // 顯示/隱藏成本毛利欄
+  document.getElementById('sCostWrap').style.display = bossMode ? 'block' : 'none';
+  document.getElementById('sProfitWrap').style.display = bossMode ? 'block' : 'none';
+}
+
+function setType(type) {
+  currentType = type;
+  document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('ttab-' + type).classList.add('active');
+  loadOrders();
+}
+
+function clearDate() {
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+}
+
+async function loadOrders() {
+  document.getElementById('orderList').innerHTML = '<div class="loading"><div class="spinner"></div>查詢中...</div>';
+
+  const q        = document.getElementById('searchQ').value.trim();
+  const dateFrom = document.getElementById('dateFrom').value;
+  const dateTo   = document.getElementById('dateTo').value;
+
+  let url = GAS_URL + '?action=getRepairOrders&type=' + currentType;
+  if (q)        url += '&q=' + encodeURIComponent(q);
+  if (dateFrom) url += '&dateFrom=' + dateFrom;
+  if (dateTo)   url += '&dateTo=' + dateTo;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    allOrders = data.orders || [];
+    renderOrders(allOrders);
+  } catch(e) {
+    document.getElementById('orderList').innerHTML = '<div class="empty">⚠️ 載入失敗，請重試</div>';
+  }
+}
+
+function renderOrders(orders) {
+  if (orders.length === 0) {
+    document.getElementById('summaryStrip').style.display = 'none';
+    document.getElementById('orderList').innerHTML = '<div class="empty">找不到符合的紀錄</div>';
+    return;
+  }
+
+  // 彙總
+  const totalRevenue = orders.reduce((s, o) => s + (Number(o['完工總額']) || 0), 0);
+  const totalCost    = orders.reduce((s, o) => s + (Number(o['成本合計']) || 0), 0);
+  const totalProfit  = orders.reduce((s, o) => s + (Number(o['毛利'])     || 0), 0);
+
+  document.getElementById('sCount').textContent = orders.length;
+  document.getElementById('sRevenue').textContent = '$' + totalRevenue.toLocaleString();
+  document.getElementById('sCost').textContent   = '$' + totalCost.toLocaleString();
+  document.getElementById('sProfit').textContent = '$' + totalProfit.toLocaleString();
+  document.getElementById('summaryStrip').style.display = 'flex';
+
+  document.getElementById('orderList').innerHTML = orders.map((o, idx) => {
+    const profit = Number(o['毛利']) || 0;
+    const profitClass = profit >= 0 ? 'profit-pos' : 'profit-neg';
+    const profitSign  = profit >= 0 ? '+' : '';
+    const items = Array.isArray(o['品項明細']) ? o['品項明細'] : [];
+
+    const itemRows = items.map(item => {
+      const subtotal = Math.round((item.qty || 1) * (item.price || 0));
+      const itemProfit = Math.round((item.qty || 1) * ((item.price || 0) - (item.cost || 0)));
+      return `<tr>
+        <td>${escHtml(item.name || '')}</td>
+        <td>${item.type || ''}</td>
+        <td class="r">${item.qty || 1}</td>
+        <td class="r">$${(item.price || 0).toLocaleString()}</td>
+        <td class="r">$${subtotal.toLocaleString()}</td>
+        <td class="r boss-only ${itemProfit >= 0 ? 'profit-pos' : 'profit-neg'}">${itemProfit >= 0 ? '+' : ''}$${itemProfit.toLocaleString()}</td>
+      </tr>`;
+    }).join('');
+
+    return `
+    <div class="order-card">
+      <div class="order-head" onclick="toggleDetail(${idx})">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span class="order-type-badge">${o['類型'] || ''}</span>
+            <span class="order-id">${o['訂單編號'] || ''}</span>
+          </div>
+          <div class="order-name">${escHtml(o['客戶姓名'] || '未填姓名')}</div>
+          <div class="order-meta">${o['接單日期'] || ''} ・ ${o['電話'] || ''} ・ ${o['車牌號碼'] || '未填車牌'}</div>
+        </div>
+        <div class="order-right">
+          <div class="order-total">$${(Number(o['完工總額']) || 0).toLocaleString()}</div>
+          <div class="order-profit boss-only ${profitClass}">${profitSign}$${profit.toLocaleString()}</div>
+        </div>
+        <div class="chevron" id="chev-${idx}">›</div>
+      </div>
+      <div class="order-detail" id="detail-${idx}">
+        <div class="detail-grid">
+          <div class="detail-item"><div class="detail-label">完成日期</div>${o['完成日期'] || '—'}</div>
+          <div class="detail-item"><div class="detail-label">車架號碼</div>${o['車架號碼'] || '—'}</div>
+          <div class="detail-item"><div class="detail-label">接單人員</div>${o['接單人員'] || '—'}</div>
+          <div class="detail-item"><div class="detail-label">維修人員</div>${o['維修人員'] || '—'}</div>
+          <div class="detail-item"><div class="detail-label">訂金</div>$${(Number(o['訂金']) || 0).toLocaleString()}</div>
+          <div class="detail-item"><div class="detail-label">餘額</div>$${(Number(o['餘額']) || 0).toLocaleString()}</div>
+        </div>
+        <table class="items-table">
+          <thead><tr>
+            <th>品項名稱</th><th>種類</th><th class="r">數量</th><th class="r">單價</th><th class="r">合計</th>
+            <th class="r boss-only">毛利</th>
+          </tr></thead>
+          <tbody>${itemRows}</tbody>
+        </table>
+        ${o['備註'] ? `<div style="margin-top:8px;font-size:12px;color:var(--muted)">備註：${escHtml(o['備註'])}</div>` : ''}
+        <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+          <div class="boss-only" style="font-size:12px;color:var(--muted);align-self:center">成本 $${(Number(o['成本合計'])||0).toLocaleString()}</div>
+          <div style="font-size:14px;font-weight:700">總計 $${(Number(o['完工總額'])||0).toLocaleString()}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDetail(idx) {
+  const detail = document.getElementById('detail-' + idx);
+  const chev   = document.getElementById('chev-' + idx);
+  detail.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// 初始載入
+loadOrders();
+
+// Enter 搜尋
+document.getElementById('searchQ').addEventListener('keydown', e => {
+  if (e.key === 'Enter') loadOrders();
+});
+</script>
+</body>
+</html>
