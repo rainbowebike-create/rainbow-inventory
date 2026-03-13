@@ -691,8 +691,8 @@ function buildItemPool() {
   (priceData.batteries || []).forEach(b => pool.push({
     code: String(b.code), name: b.name, category: 'battery', type: '電池',
     cost: b.cost || 0,
-    price: isParts ? (b.retailPrice || 0) : (b.withCarPrice || 0),
-    priceLabel: isParts ? '零售價' : '隨車價'
+    price: b.retailPrice || 0,
+    priceLabel: '零售價'
   }));
   (priceData.accessories || []).forEach(a => pool.push({
     code: String(a.code), name: a.name, category: 'accessory', type: '配件',
@@ -761,7 +761,7 @@ function renderDrawer() {
 function selectDrawerItem(idx) {
   const pool = document.getElementById('drawerList')._pool;
   const item = pool[idx];
-  addItemRow(item.name, item.type, 1, item.cost, item.price);
+  addItemRow(item.name, item.type, 1, item.cost, item.price, item.code);
   closeDrawer();
 }
 
@@ -770,9 +770,9 @@ function addManualRow(name = '') {
   addItemRow(name, '零件', 1, 0, 0);
 }
 
-function addItemRow(name, type, qty, cost, price) {
+function addItemRow(name, type, qty, cost, price, code = '') {
   const id = Date.now() + Math.random();
-  items.push({ id, name, type, qty, cost, price });
+  items.push({ id, name, type, qty, cost, price, code });
   renderItems();
   // focus name if empty
   if (!name) {
