@@ -616,6 +616,9 @@ body {
     <div class="drawer-tab" onclick="setDrawerTab('accessory')" id="dtab-accessory">🔩 配件</div>
     <div class="drawer-tab" onclick="setDrawerTab('charger')" id="dtab-charger">🔌 充電器</div>
     <div class="drawer-tab" onclick="setDrawerTab('controller')" id="dtab-controller">⚙️ 控制器</div>
+    <div class="drawer-tab" onclick="setDrawerTab('caliper')" id="dtab-caliper">🔴 卡鉗</div>
+    <div class="drawer-tab" onclick="setDrawerTab('rotor')" id="dtab-rotor">⭕ 碟盤</div>
+    <div class="drawer-tab" onclick="setDrawerTab('swingarm')" id="dtab-swingarm">🔧 平叉</div>
   </div>
   <div class="drawer-list" id="drawerList"></div>
 </div>
@@ -690,9 +693,7 @@ function buildItemPool() {
   const pool = [];
   (priceData.batteries || []).forEach(b => pool.push({
     code: String(b.code), name: b.name, category: 'battery', type: '電池',
-    cost: b.cost || 0,
-    price: b.retailPrice || 0,
-    priceLabel: '零售價'
+    cost: b.cost || 0, price: b.retailPrice || 0, priceLabel: '零售價'
   }));
   (priceData.accessories || []).forEach(a => pool.push({
     code: String(a.code), name: a.name, category: 'accessory', type: '配件',
@@ -705,6 +706,18 @@ function buildItemPool() {
   (priceData.controllers || []).forEach(c => pool.push({
     code: String(c.code), name: c.name, category: 'controller', type: '控制器',
     cost: c.cost || 0, price: c.price || 0, priceLabel: isParts ? '零售價' : '完工價'
+  }));
+  (priceData.calipers || []).forEach(c => pool.push({
+    code: String(c.code), name: c.name, category: 'caliper', type: '卡鉗',
+    cost: c.cost || 0, price: isParts ? (c.retailPrice||0) : (c.price||0), priceLabel: isParts ? '零售價' : '完工價'
+  }));
+  (priceData.rotors || []).forEach(c => pool.push({
+    code: String(c.code), name: c.name, category: 'rotor', type: '碟盤',
+    cost: c.cost || 0, price: isParts ? (c.retailPrice||0) : (c.price||0), priceLabel: isParts ? '零售價' : '完工價'
+  }));
+  (priceData.swingarms || []).forEach(c => pool.push({
+    code: String(c.code), name: c.name, category: 'swingarm', type: '平叉',
+    cost: c.cost || 0, price: isParts ? (c.retailPrice||0) : (c.price||0), priceLabel: isParts ? '零售價' : '完工價'
   }));
   return pool;
 }
