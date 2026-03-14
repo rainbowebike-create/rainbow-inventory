@@ -7,267 +7,75 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #242424;
-    --border: #2e2e2e;
-    --orange: #ff6b35;
-    --orange2: #ff8c5a;
-    --text: #f0f0f0;
-    --text2: #999;
-    --green: #4caf82;
-    --red: #e05252;
-    --blue: #5b8dee;
+    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
+    --orange: #ff6b35; --orange2: #ff8c5a; --text: #f0f0f0; --text2: #999;
+    --green: #4caf82; --red: #e05252; --blue: #5b8dee; --yellow: #e8c547;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Noto Sans TC', sans-serif;
-    min-height: 100vh;
-  }
-
-  /* Header */
+  body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; min-height: 100vh; }
   .header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+    position: sticky; top: 0; z-index: 100;
   }
-  .header-icon {
-    width: 36px; height: 36px;
-    background: var(--orange);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
+  .header-icon { width: 36px; height: 36px; background: var(--orange); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
   .header-title { font-size: 16px; font-weight: 700; }
   .header-sub { font-size: 10px; color: var(--text2); letter-spacing: 2px; text-transform: uppercase; }
-
-  /* Tabs */
-  .tabs {
-    display: flex;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 16px;
-    gap: 4px;
-  }
-  .tab {
-    padding: 12px 20px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text2);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-  }
-  .tab.active {
-    color: var(--orange);
-    border-bottom-color: var(--orange);
-  }
-
-  /* Search bar */
-  .search-wrap {
-    padding: 16px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-  }
-  .search-box {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 10px 14px;
-    transition: border-color 0.2s;
-  }
+  .tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; gap: 4px; }
+  .tab { padding: 12px 20px; font-size: 13px; font-weight: 600; color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+  .tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+  .search-wrap { padding: 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .search-box { display: flex; gap: 8px; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; transition: border-color 0.2s; }
   .search-box:focus-within { border-color: var(--orange); }
-  .search-box input {
-    flex: 1;
-    background: none;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-size: 14px;
-    font-family: 'Noto Sans TC', sans-serif;
-  }
+  .search-box input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-size: 14px; font-family: 'Noto Sans TC', sans-serif; }
   .search-box input::placeholder { color: var(--text2); }
-  .search-icon { color: var(--text2); font-size: 16px; }
-  .search-hint {
-    margin-top: 8px;
-    font-size: 11px;
-    color: var(--text2);
-    padding: 0 4px;
-  }
-
-  /* Search button */
-  .btn-search {
-    width: 100%;
-    margin-top: 10px;
-    padding: 12px;
-    background: var(--orange);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 700;
-    font-family: 'Noto Sans TC', sans-serif;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
+  .search-hint { margin-top: 8px; font-size: 11px; color: var(--text2); padding: 0 4px; }
+  .btn-search { width: 100%; margin-top: 10px; padding: 12px; background: var(--orange); color: white; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; font-family: 'Noto Sans TC', sans-serif; cursor: pointer; transition: background 0.2s; }
   .btn-search:active { background: var(--orange2); }
-
-  /* Content */
   .content { padding: 16px; }
-
-  /* Loading */
-  .loading {
-    text-align: center;
-    padding: 40px;
-    color: var(--text2);
-    font-size: 13px;
-  }
-  .spinner {
-    width: 28px; height: 28px;
-    border: 3px solid var(--border);
-    border-top-color: var(--orange);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 12px;
-  }
+  .loading { text-align: center; padding: 40px; color: var(--text2); font-size: 13px; }
+  .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Empty */
-  .empty {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text2);
-  }
+  .empty { text-align: center; padding: 60px 20px; color: var(--text2); }
   .empty-icon { font-size: 48px; margin-bottom: 12px; }
   .empty-text { font-size: 14px; }
-
-  /* Result card - Customer */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    margin-bottom: 12px;
-    overflow: hidden;
-    animation: fadeIn 0.3s ease;
-  }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; animation: fadeIn 0.3s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-  .card-header {
-    padding: 14px 16px;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .card-name {
-    font-size: 16px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .card-date {
-    font-size: 11px;
-    color: var(--text2);
-    font-family: 'JetBrains Mono', monospace;
-  }
+  .card-header { padding: 14px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-name { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .card-date { font-size: 11px; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
   .card-body { padding: 14px 16px; }
-
-  .info-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 10px;
-    font-size: 13px;
-  }
+  .info-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 13px; }
   .info-row:last-child { margin-bottom: 0; }
-  .info-label {
-    color: var(--text2);
-    min-width: 60px;
-    font-size: 12px;
-    padding-top: 1px;
-  }
+  .info-label { color: var(--text2); min-width: 70px; font-size: 12px; padding-top: 1px; }
   .info-value { color: var(--text); flex: 1; }
-
-  .tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text2);
-  }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); }
   .tag.car { background: rgba(255,107,53,0.15); border-color: rgba(255,107,53,0.3); color: var(--orange); }
   .tag.phone { background: rgba(91,141,238,0.15); border-color: rgba(91,141,238,0.3); color: var(--blue); }
-
-  /* Repair card */
-  .repair-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    margin-bottom: 12px;
-    overflow: hidden;
-    animation: fadeIn 0.3s ease;
-  }
-  .repair-header {
-    padding: 12px 16px;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .repair-name {
-    font-size: 14px;
-    font-weight: 700;
-  }
-  .repair-status {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 6px;
-  }
+  .tag.repair { background: rgba(232,197,71,0.15); border-color: rgba(232,197,71,0.3); color: var(--yellow); }
+  .repair-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; animation: fadeIn 0.3s ease; }
+  .repair-header { padding: 12px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+  .repair-name { font-size: 14px; font-weight: 700; }
+  .repair-status { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
   .repair-status.done { background: rgba(76,175,130,0.15); color: var(--green); }
   .repair-status.pending { background: rgba(224,82,82,0.15); color: var(--red); }
   .repair-body { padding: 14px 16px; }
-
-  .amount-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-  }
+  /* 品項明細表格 */
+  .items-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+  .items-table th { background: var(--surface2); padding: 6px 8px; text-align: left; color: var(--text2); font-size: 11px; border-bottom: 1px solid var(--border); }
+  .items-table th.r { text-align: right; }
+  .items-table td { padding: 6px 8px; border-bottom: 1px solid #1e1e1e; }
+  .items-table td.r { text-align: right; font-family: 'JetBrains Mono', monospace; }
+  .items-table tr:last-child td { border-bottom: none; }
+  .amount-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
   .amount-label { font-size: 12px; color: var(--text2); }
   .amount-value { font-size: 16px; font-weight: 700; color: var(--orange); font-family: 'JetBrains Mono', monospace; }
-
-  /* Result count */
-  .result-count {
-    font-size: 12px;
-    color: var(--text2);
-    margin-bottom: 12px;
-    padding: 0 2px;
-  }
+  .result-count { font-size: 12px; color: var(--text2); margin-bottom: 12px; padding: 0 2px; }
   .result-count span { color: var(--orange); font-weight: 700; }
+  .source-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(232,197,71,0.1); color: var(--yellow); border: 1px solid rgba(232,197,71,0.2); margin-left: 6px; }
 </style>
 </head>
 <body>
-
 <div class="header">
   <div class="header-icon">🌈</div>
   <div>
@@ -275,196 +83,200 @@
     <div class="header-sub">Customer Search</div>
   </div>
 </div>
-
 <div class="tabs">
   <div class="tab active" onclick="switchTab('customer')">🛵 購買紀錄</div>
   <div class="tab" onclick="switchTab('repair')">🔧 維修紀錄</div>
 </div>
-
 <div class="search-wrap">
   <div class="search-box">
-    <span class="search-icon">🔍</span>
-    <input type="text" id="searchInput" placeholder="輸入姓名、電話、車牌..." autocomplete="off"
+    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="輸入姓名、電話、車牌、車架號碼..." autocomplete="off"
       onkeydown="if(event.key==='Enter') doSearch()">
   </div>
   <div class="search-hint" id="searchHint">可搜尋：姓名、電話、車牌、車架號碼</div>
   <button class="btn-search" onclick="doSearch()">搜尋</button>
 </div>
-
 <div class="content" id="content">
-  <div class="empty">
-    <div class="empty-icon">🔍</div>
-    <div class="empty-text">輸入關鍵字開始搜尋</div>
-  </div>
+  <div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">輸入關鍵字開始搜尋</div></div>
 </div>
-
 <script>
-// ── 設定 ──
 const CUSTOMER_SHEET_ID = '1QyRKuwinuhdN6ReGzCQMcXE5sem6dIYqMq7M4eDLcrs';
+const NEW_SHEET_ID = '1bXikm7KQGHrVjr3ua3TXAxbINlra50JcLXFtPAIhnSA';
 const API_KEY = 'AIzaSyCwJje5ims-fXMxQna0gAnG-hHmANFqF24';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxJ9Vj0bbsemvgLwED1ivTMcuZ3mut_s9dXKDmnQd_2htCocCEXHQPefv5xitaiQy8a3g/exec';
 
 let currentTab = 'customer';
 let customerData = [];
-let repairData = [];
-let dataLoaded = false;
+let repairOldData = [];
+let repairNewData = [];
+let dataLoaded = { customer: false, repair: false };
 
-// ── Tab 切換 ──
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach((t, i) => {
-    t.classList.toggle('active', (i === 0 && tab === 'customer') || (i === 1 && tab === 'repair'));
+    t.classList.toggle('active', (i===0&&tab==='customer')||(i===1&&tab==='repair'));
   });
-  const hint = tab === 'customer'
-    ? '可搜尋：姓名、電話、車牌、車架號碼'
-    : '可搜尋：姓名、電話、車款';
-  document.getElementById('searchHint').textContent = hint;
-  document.getElementById('searchInput').placeholder = tab === 'customer' ? '輸入姓名、電話、車牌...' : '輸入姓名、電話...';
-
+  document.getElementById('searchHint').textContent = tab==='customer' ? '可搜尋：姓名、電話、車牌、車架號碼' : '可搜尋：姓名、電話、車牌、車架號碼、訂單編號';
+  document.getElementById('searchInput').placeholder = tab==='customer' ? '輸入姓名、電話、車牌...' : '輸入姓名、電話、車牌...';
   const keyword = document.getElementById('searchInput').value.trim();
-  if (keyword) doSearch();
-  else showEmpty();
+  if (keyword) doSearch(); else showEmpty();
 }
 
-// ── 載入資料 ──
-async function loadData() {
-  if (dataLoaded) return;
-  showLoading();
+async function loadCustomerData() {
+  if (dataLoaded.customer) return;
   try {
-    const [custRes, repairRes] = await Promise.all([
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${CUSTOMER_SHEET_ID}/values/客戶資料?key=${API_KEY}`),
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${CUSTOMER_SHEET_ID}/values/維修紀錄?key=${API_KEY}`)
-    ]);
-    const custJson = await custRes.json();
-    const repairJson = await repairRes.json();
-
-    customerData = (custJson.values || []).slice(1).filter(r => r.length > 2);
-    repairData = (repairJson.values || []).slice(1).filter(r => r.length > 2);
-    dataLoaded = true;
-  } catch(e) {
-    showError('資料載入失敗，請確認網路連線');
-  }
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${CUSTOMER_SHEET_ID}/values/客戶資料?key=${API_KEY}`);
+    const json = await res.json();
+    customerData = (json.values || []).slice(1).filter(r => r.length > 2);
+    dataLoaded.customer = true;
+  } catch(e) { showError('客戶資料載入失敗'); }
 }
 
-// ── 搜尋 ──
+async function loadRepairData() {
+  if (dataLoaded.repair) return;
+  try {
+    // 舊維修紀錄（舊 Sheets）
+    const oldRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${CUSTOMER_SHEET_ID}/values/維修紀錄?key=${API_KEY}`);
+    const oldJson = await oldRes.json();
+    repairOldData = (oldJson.values || []).slice(1).filter(r => r.length > 2);
+
+    // 新維修訂單（GAS）
+    const newRes = await fetch(GAS_URL + '?action=getRepairOrders&type=all');
+    const newJson = await newRes.json();
+    repairNewData = newJson.orders || [];
+
+    dataLoaded.repair = true;
+  } catch(e) { showError('維修資料載入失敗'); }
+}
+
 async function doSearch() {
   const keyword = document.getElementById('searchInput').value.trim();
   if (!keyword) { showEmpty(); return; }
-
-  await loadData();
-  if (!dataLoaded) return;
-
-  const kw = keyword.replace(/-/g, '').replace(/\s/g, '').toUpperCase();
+  showLoading();
 
   if (currentTab === 'customer') {
-    const results = customerData.filter(row => {
-      const searchable = row.join('').replace(/-/g, '').replace(/\s/g, '').toUpperCase();
-      return searchable.includes(kw);
-    });
+    await loadCustomerData();
+    const kw = keyword.replace(/-/g,'').replace(/\s/g,'').toUpperCase();
+    const results = customerData.filter(row => row.join('').replace(/-/g,'').replace(/\s/g,'').toUpperCase().includes(kw));
     renderCustomers(results, keyword);
   } else {
-    const results = repairData.filter(row => {
-      const searchable = row.join('').replace(/-/g, '').replace(/\s/g, '').toUpperCase();
+    await loadRepairData();
+    const kw = keyword.replace(/-/g,'').replace(/\s/g,'').toUpperCase();
+
+    // 搜尋舊維修紀錄
+    const oldResults = repairOldData.filter(row => row.join('').replace(/-/g,'').replace(/\s/g,'').toUpperCase().includes(kw));
+
+    // 搜尋新維修訂單
+    const newResults = repairNewData.filter(o => {
+      const searchable = [o['客戶姓名'],o['電話'],o['備用電話'],o['車牌號碼'],o['車架號碼'],o['訂單編號']].join('').replace(/-/g,'').replace(/\s/g,'').toUpperCase();
       return searchable.includes(kw);
     });
-    renderRepairs(results, keyword);
+
+    renderRepairs(oldResults, newResults, keyword);
   }
 }
 
-// ── 渲染客戶 ──
 function renderCustomers(results, keyword) {
   const content = document.getElementById('content');
   if (!results.length) {
     content.innerHTML = `<div class="empty"><div class="empty-icon">😕</div><div class="empty-text">找不到「${keyword}」的購買紀錄</div></div>`;
     return;
   }
-
   let html = `<div class="result-count">找到 <span>${results.length}</span> 筆購買紀錄</div>`;
   results.forEach(row => {
     const get = i => row[i] || '';
-    const date   = get(0);
-    const model  = get(1);
-    const name   = get(2);
-    const phone  = get(6);
-    const phone2 = get(7) || get(12) || '';
-    const plate  = get(8);
-    const frame  = get(9);
-    const stamp  = get(10);
-    const addr   = get(16) || get(15) || '';
-    const note   = get(18) || '';
-
     html += `
     <div class="card">
       <div class="card-header">
-        <div class="card-name">👤 ${name}</div>
-        <div class="card-date">${date}</div>
+        <div class="card-name">👤 ${get(2)}</div>
+        <div class="card-date">${get(0)}</div>
       </div>
       <div class="card-body">
-        <div class="info-row">
-          <span class="info-label">車款</span>
-          <span class="info-value"><span class="tag car">🛵 ${model}</span></span>
-        </div>
-        ${plate ? `<div class="info-row"><span class="info-label">車牌</span><span class="info-value">${plate}</span></div>` : ''}
-        ${frame ? `<div class="info-row"><span class="info-label">車架</span><span class="info-value">${frame}</span></div>` : ''}
-        ${stamp ? `<div class="info-row"><span class="info-label">標章</span><span class="info-value">${stamp}</span></div>` : ''}
-        <div class="info-row">
-          <span class="info-label">電話</span>
-          <span class="info-value">
-            <span class="tag phone">📱 ${phone}</span>
-            ${phone2 ? `<span class="tag phone" style="margin-left:4px">📱 ${phone2}</span>` : ''}
-          </span>
-        </div>
-        ${addr ? `<div class="info-row"><span class="info-label">地址</span><span class="info-value">${addr}</span></div>` : ''}
-        ${note ? `<div class="info-row"><span class="info-label">備註</span><span class="info-value">${note}</span></div>` : ''}
+        ${get(1) ? `<div class="info-row"><span class="info-label">車款</span><span class="info-value"><span class="tag car">🛵 ${get(1)}</span></span></div>` : ''}
+        ${get(8) ? `<div class="info-row"><span class="info-label">車牌</span><span class="info-value">${get(8)}</span></div>` : ''}
+        ${get(9) ? `<div class="info-row"><span class="info-label">車架</span><span class="info-value">${get(9)}</span></div>` : ''}
+        ${get(6) ? `<div class="info-row"><span class="info-label">電話</span><span class="info-value"><span class="tag phone">📱 ${get(6)}</span>${get(7)?`<span class="tag phone" style="margin-left:4px">📱 ${get(7)}</span>`:''}</span></div>` : ''}
+        ${get(15)||get(16) ? `<div class="info-row"><span class="info-label">地址</span><span class="info-value">${get(16)||get(15)}</span></div>` : ''}
+        ${get(18) ? `<div class="info-row"><span class="info-label">備註</span><span class="info-value">${get(18)}</span></div>` : ''}
       </div>
     </div>`;
   });
-
   content.innerHTML = html;
 }
 
-// ── 渲染維修 ──
-function renderRepairs(results, keyword) {
+function renderRepairs(oldResults, newResults, keyword) {
   const content = document.getElementById('content');
-  if (!results.length) {
+  const total = oldResults.length + newResults.length;
+  if (!total) {
     content.innerHTML = `<div class="empty"><div class="empty-icon">😕</div><div class="empty-text">找不到「${keyword}」的維修紀錄</div></div>`;
     return;
   }
+  let html = `<div class="result-count">找到 <span>${total}</span> 筆維修紀錄</div>`;
 
-  // 最新的排前面
-  const sorted = [...results].reverse();
-
-  let html = `<div class="result-count">找到 <span>${results.length}</span> 筆維修紀錄</div>`;
-  sorted.forEach(row => {
-    const get = i => row[i] || '';
-    const date   = get(0);
-    const name   = get(1);
-    const model  = get(2);
-    const item   = get(3);
-    const phone  = get(4) || get(5) || get(6) || '';
-    const note   = get(7);
-    const total  = get(10);
-    const done   = get(11);
-
-    const isDone = done && done !== '未完成' && done !== '待處理';
-    const statusText = isDone ? '已完成' : (done || '處理中');
-    const statusClass = isDone ? 'done' : 'pending';
+  // 新維修訂單（有品項明細）
+  newResults.forEach(o => {
+    const items = Array.isArray(o['品項明細']) ? o['品項明細'] : [];
+    const itemRows = items.map(item => `
+      <tr>
+        <td>${escHtml(item.name||'')}</td>
+        <td>${item.type||''}</td>
+        <td class="r">${item.qty||1}</td>
+        <td class="r">$${(item.price||0).toLocaleString()}</td>
+        <td class="r">$${Math.round((item.qty||1)*(item.price||0)).toLocaleString()}</td>
+      </tr>`).join('');
 
     html += `
     <div class="repair-card">
       <div class="repair-header">
-        <div class="repair-name">👤 ${name} <span style="color:var(--text2);font-weight:400;font-size:12px">｜ ${date}</span></div>
-        <div class="repair-status ${statusClass}">${statusText}</div>
+        <div class="repair-name">👤 ${escHtml(o['客戶姓名']||'未填姓名')} <span class="source-badge">新系統</span></div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:11px;color:var(--text2)">${o['接單日期']||''}</span>
+          <span class="repair-status done">已完成</span>
+        </div>
       </div>
       <div class="repair-body">
-        ${model ? `<div class="info-row"><span class="info-label">車款</span><span class="info-value"><span class="tag car">🛵 ${model}</span></span></div>` : ''}
-        ${item ? `<div class="info-row"><span class="info-label">維修項目</span><span class="info-value">${item}</span></div>` : ''}
-        ${phone ? `<div class="info-row"><span class="info-label">電話</span><span class="info-value"><span class="tag phone">📱 ${phone}</span></span></div>` : ''}
-        ${note ? `<div class="info-row"><span class="info-label">備註</span><span class="info-value">${note}</span></div>` : ''}
-        ${total ? `
-        <div class="amount-row">
-          <span class="amount-label">維修金額</span>
-          <span class="amount-value">$${Number(total).toLocaleString()}</span>
+        <div class="info-row"><span class="info-label">訂單編號</span><span class="info-value" style="font-family:monospace;font-size:12px">${o['訂單編號']||''}</span></div>
+        <div class="info-row"><span class="info-label">類型</span><span class="info-value"><span class="tag repair">${o['類型']||''}</span></span></div>
+        ${o['電話'] ? `<div class="info-row"><span class="info-label">電話</span><span class="info-value"><span class="tag phone">📱 ${o['電話']}</span></span></div>` : ''}
+        ${o['車牌號碼'] ? `<div class="info-row"><span class="info-label">車牌</span><span class="info-value">${o['車牌號碼']}</span></div>` : ''}
+        ${o['車架號碼'] ? `<div class="info-row"><span class="info-label">車架</span><span class="info-value">${o['車架號碼']}</span></div>` : ''}
+        ${o['維修人員'] ? `<div class="info-row"><span class="info-label">維修人員</span><span class="info-value">${o['維修人員']}</span></div>` : ''}
+        ${items.length > 0 ? `
+        <div class="info-row" style="flex-direction:column;gap:4px">
+          <span class="info-label">品項明細</span>
+          <table class="items-table">
+            <thead><tr><th>品項</th><th>種類</th><th class="r">數量</th><th class="r">單價</th><th class="r">合計</th></tr></thead>
+            <tbody>${itemRows}</tbody>
+          </table>
         </div>` : ''}
+        ${o['備註'] ? `<div class="info-row"><span class="info-label">備註</span><span class="info-value">${escHtml(o['備註'])}</span></div>` : ''}
+        <div class="amount-row">
+          <span class="amount-label">完工總額</span>
+          <span class="amount-value">$${(Number(o['完工總額'])||0).toLocaleString()}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  // 舊維修紀錄
+  [...oldResults].reverse().forEach(row => {
+    const get = i => row[i] || '';
+    const isDone = get(11) && get(11) !== '未完成' && get(11) !== '待處理';
+    html += `
+    <div class="repair-card">
+      <div class="repair-header">
+        <div class="repair-name">👤 ${get(1)}</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:11px;color:var(--text2)">${get(0)}</span>
+          <span class="repair-status ${isDone?'done':'pending'}">${isDone?'已完成':get(11)||'處理中'}</span>
+        </div>
+      </div>
+      <div class="repair-body">
+        ${get(2) ? `<div class="info-row"><span class="info-label">車款</span><span class="info-value"><span class="tag car">🛵 ${get(2)}</span></span></div>` : ''}
+        ${get(3) ? `<div class="info-row"><span class="info-label">維修項目</span><span class="info-value">${get(3)}</span></div>` : ''}
+        ${get(4)||get(5)||get(6) ? `<div class="info-row"><span class="info-label">電話</span><span class="info-value"><span class="tag phone">📱 ${get(4)||get(5)||get(6)}</span></span></div>` : ''}
+        ${get(7) ? `<div class="info-row"><span class="info-label">備註</span><span class="info-value">${get(7)}</span></div>` : ''}
+        ${get(10) ? `<div class="amount-row"><span class="amount-label">維修金額</span><span class="amount-value">$${Number(get(10)).toLocaleString()}</span></div>` : ''}
       </div>
     </div>`;
   });
@@ -472,16 +284,12 @@ function renderRepairs(results, keyword) {
   content.innerHTML = html;
 }
 
-// ── UI helpers ──
-function showLoading() {
-  document.getElementById('content').innerHTML = `<div class="loading"><div class="spinner"></div>搜尋中...</div>`;
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-function showEmpty() {
-  document.getElementById('content').innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">輸入關鍵字開始搜尋</div></div>`;
-}
-function showError(msg) {
-  document.getElementById('content').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">${msg}</div></div>`;
-}
+function showLoading() { document.getElementById('content').innerHTML = `<div class="loading"><div class="spinner"></div>搜尋中...</div>`; }
+function showEmpty() { document.getElementById('content').innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">輸入關鍵字開始搜尋</div></div>`; }
+function showError(msg) { document.getElementById('content').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">${msg}</div></div>`; }
 </script>
 </body>
 </html>
