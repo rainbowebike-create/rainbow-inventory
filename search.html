@@ -162,14 +162,23 @@ async function doSearch() {
   } else {
     await loadRepairData();
     const kw = keyword.replace(/-/g,'').replace(/\s/g,'').toUpperCase();
+    // 同時產生去掉開頭0的版本，讓電話有0沒0都能查到
+    const kwNo0 = kw.replace(/^0+/, '');
+
+    const matchKw = (str) => {
+      const s = String(str).replace(/-/g,'').replace(/\s/g,'').toUpperCase();
+      return s.includes(kw) || s.includes(kwNo0);
+    };
 
     // 搜尋舊維修紀錄
-    const oldResults = repairOldData.filter(row => row.join('').replace(/-/g,'').replace(/\s/g,'').toUpperCase().includes(kw));
+    const oldResults = repairOldData.filter(row => {
+      const s = row.join('').replace(/-/g,'').replace(/\s/g,'').toUpperCase();
+      return s.includes(kw) || s.includes(kwNo0);
+    });
 
     // 搜尋新維修訂單
     const newResults = repairNewData.filter(o => {
-      const searchable = [o['客戶姓名'],o['電話'],o['備用電話'],o['車牌號碼'],o['車架號碼'],o['訂單編號']].join('').replace(/-/g,'').replace(/\s/g,'').toUpperCase();
-      return searchable.includes(kw);
+      return [o['客戶姓名'],o['電話'],o['備用電話'],o['車牌號碼'],o['車架號碼'],o['訂單編號']].some(v => matchKw(v||''));
     });
 
     renderRepairs(oldResults, newResults, keyword);
