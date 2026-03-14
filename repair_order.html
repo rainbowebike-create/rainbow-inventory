@@ -697,15 +697,15 @@ function buildItemPool() {
   }));
   (priceData.accessories || []).forEach(a => pool.push({
     code: String(a.code), name: a.name, category: 'accessory', type: '配件',
-    cost: a.cost || 0, price: a.price || 0, priceLabel: isParts ? '零售價' : '完工價'
+    cost: a.cost || 0, price: isParts ? (a.retailPrice||0) : (a.price||0), priceLabel: isParts ? '零售價' : '完工價'
   }));
   (priceData.chargers || []).forEach(c => pool.push({
     code: String(c.code), name: c.name, category: 'charger', type: '充電器',
-    cost: c.cost || 0, price: c.price || 0, priceLabel: isParts ? '零售價' : '完工價'
+    cost: c.cost || 0, price: isParts ? (c.retailPrice||0) : (c.price||0), priceLabel: isParts ? '零售價' : '完工價'
   }));
   (priceData.controllers || []).forEach(c => pool.push({
     code: String(c.code), name: c.name, category: 'controller', type: '控制器',
-    cost: c.cost || 0, price: c.price || 0, priceLabel: isParts ? '零售價' : '完工價'
+    cost: c.cost || 0, price: isParts ? (c.retailPrice||0) : (c.price||0), priceLabel: isParts ? '零售價' : '完工價'
   }));
   (priceData.calipers || []).forEach(c => pool.push({
     code: String(c.code), name: c.name, category: 'caliper', type: '卡鉗',
