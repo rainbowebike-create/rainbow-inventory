@@ -167,7 +167,9 @@ async function doSearch() {
 
     const matchKw = (str) => {
       const s = String(str).replace(/-/g,'').replace(/\s/g,'').toUpperCase();
-      return s.includes(kw) || s.includes(kwNo0);
+      const sNo0 = s.replace(/^0+/, '');
+      // 雙向比對：輸入有0查沒0，或輸入沒0查有0都能找到
+      return s.includes(kw) || s.includes(kwNo0) || sNo0.includes(kw) || sNo0.includes(kwNo0);
     };
 
     // 搜尋舊維修紀錄
